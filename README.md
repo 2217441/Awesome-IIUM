@@ -17,8 +17,8 @@ _Read this in other languages: [Bahasa Melayu](translation/README.my.md),
 - [Welcome](#-welcome)
 - [Contents](#-contents)
 - [Quick Links](#-quick-links)
-- [Contributing](#-contributing)
-- [License](#-license)
+- [Contributing](CONTRIBUTING.md)
+- [License](LICENSE.md)
 
 ## 👋 Welcome
 
