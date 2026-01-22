@@ -202,19 +202,21 @@
     // Save data
     saveBtn?.addEventListener('click', () => {
       const data = {
-        prevCgpa: document.getElementById('prev-cgpa').value,
-        prevCredits: document.getElementById('prev-credits').value,
+        prevCgpa: (document.getElementById('prev-cgpa') as HTMLInputElement).value,
+        prevCredits: (document.getElementById('prev-credits') as HTMLInputElement).value,
       };
       localStorage.setItem('iium-gpa-data', JSON.stringify(data));
 
-      const originalText = saveBtn.innerText;
-      saveBtn.innerText = '✅ Saved!';
-      saveBtn.disabled = true;
+      if (saveBtn instanceof HTMLButtonElement) {
+        const originalText = saveBtn.innerText;
+        saveBtn.innerText = '✅ Saved!';
+        saveBtn.disabled = true;
 
-      setTimeout(() => {
-        saveBtn.innerText = originalText;
-        saveBtn.disabled = false;
-      }, 2000);
+        setTimeout(() => {
+          saveBtn.innerText = originalText;
+          saveBtn.disabled = false;
+        }, 2000);
+      }
     });
   });
 </script>
