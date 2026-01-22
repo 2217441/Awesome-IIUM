@@ -18,13 +18,23 @@
       const list = document.getElementById('contributor-list');
       if (!list) return;
       
+      const escapeHtml = (str) => {
+        if (!str) return '';
+        return String(str)
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;')
+          .replace(/'/g, '&#039;');
+      };
+
       list.innerHTML = data.map((user, index) => `
-        <a href="${user.html_url}" target="_blank" class="contributor-card rank-${index + 1}">
+        <a href="${escapeHtml(user.html_url)}" target="_blank" rel="noopener noreferrer" class="contributor-card rank-${index + 1}">
           <div class="rank">#${index + 1}</div>
-          <img src="${user.avatar_url}" alt="${user.login}" class="avatar" />
+          <img src="${escapeHtml(user.avatar_url)}" alt="${escapeHtml(user.login)}" class="avatar" />
           <div class="info">
-            <span class="username">${user.login}</span>
-            <span class="contributions">${user.contributions} Contributions</span>
+            <span class="username">${escapeHtml(user.login)}</span>
+            <span class="contributions">${escapeHtml(user.contributions)} Contributions</span>
           </div>
         </a>
       `).join('');
