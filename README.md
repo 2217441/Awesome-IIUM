@@ -14,15 +14,11 @@ _Read this in other languages: [Bahasa Melayu](translation/README.my.md),
 
 ## 📖 Table of Contents
 
-- [👋 Welcome](#-welcome) - Introduction to Awesome IIUM.
-- [📂 Contents](#-contents) - Explore organized categories of resources.
-  - [Academics](src/content/docs/categories/academics/index.md) - Academic resources and guides.
-  - [Campus Life](src/content/docs/categories/campus-life/index.md) - Campus facilities and student life.
-  - [Career & Internships](src/content/docs/categories/career/index.md) - Career prospects and internship opportunities.
-  - [Developers](src/content/docs/categories/developers/index.md) - Technical resources for developers.
-- [🌟 Quick Links](#-quick-links) - Jump directly to frequently used services.
-- [🤝 Contributing](#-contributing) - Guidelines on how to contribute to this list.
-- [📜 License](#-license) - Licensing information for this repository.
+- [Welcome](#-welcome)
+- [Contents](#-contents)
+- [Quick Links](#-quick-links)
+- [Contributing](#-contributing)
+- [License](#-license)
 
 ## 👋 Welcome
 
