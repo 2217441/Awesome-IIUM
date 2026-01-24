@@ -144,7 +144,24 @@
       if (btn) {
         const rows = container.querySelectorAll('.course-row');
         if (rows.length > 1) {
-          btn.closest('.course-row').remove();
+          const rowToRemove = btn.closest('.course-row');
+
+          // Palette: Manage focus after deletion
+          let nextFocusElement = null;
+          const nextRow = rowToRemove.nextElementSibling;
+          const prevRow = rowToRemove.previousElementSibling;
+
+          if (nextRow && nextRow.classList.contains('course-row')) {
+            nextFocusElement = nextRow.querySelector('.remove-btn');
+          } else if (prevRow && prevRow.classList.contains('course-row')) {
+            nextFocusElement = prevRow.querySelector('.remove-btn');
+          }
+
+          rowToRemove.remove();
+
+          if (nextFocusElement) {
+            (nextFocusElement as HTMLElement).focus();
+          }
         }
       }
     });
