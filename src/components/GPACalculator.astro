@@ -144,7 +144,20 @@
       if (btn) {
         const rows = container.querySelectorAll('.course-row');
         if (rows.length > 1) {
-          btn.closest('.course-row').remove();
+          const row = btn.closest('.course-row');
+          const currentRowIndex = Array.from(rows).indexOf(row);
+
+          row.remove();
+
+          // Focus management: move to next row, or previous if it was the last one
+          const remainingRows = container.querySelectorAll('.course-row');
+          const targetIndex = Math.min(currentRowIndex, remainingRows.length - 1);
+          const targetRow = remainingRows[targetIndex];
+
+          if (targetRow) {
+            const targetBtn = targetRow.querySelector('.remove-btn') as HTMLButtonElement | null;
+            targetBtn?.focus();
+          }
         }
       }
     });
