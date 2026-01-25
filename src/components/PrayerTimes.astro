@@ -120,32 +120,51 @@ const defaultCampus = 'gombak';
     }
   }
 
+  // Basic HTML escaping to prevent XSS
+  function escapeHtml(unsafe) {
+    if (unsafe == null) return '';
+    return String(unsafe)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
+  }
+
   function renderTimes(data) {
     const grid = document.getElementById('prayer-grid');
     const hijriDiv = document.getElementById('hijri-date');
     
     // Render Hijri date
     const hijri = data.date.hijri;
-    hijriDiv.textContent = `${hijri.day} ${hijri.month.en} ${hijri.year} AH`;
+    // Use textContent for safety
+    if (hijriDiv) {
+      hijriDiv.textContent = `${hijri.day} ${hijri.month.en} ${hijri.year} AH`;
+    }
 
     // Pre-parse times
     parsedPrayers = prayers.map(prayer => {
       const time = data.timings[prayer.key];
+      // Basic validation/fallback
+      if (typeof time !== 'string' || !time.includes(':')) {
+        return { ...prayer, hours: 0, minutes: 0, totalMinutes: 0 };
+      }
       const [hours, minutes] = time.split(':').map(Number);
       return {
         ...prayer,
-        hours,
-        minutes,
-        totalMinutes: hours * 60 + minutes
+        hours: isNaN(hours) ? 0 : hours,
+        minutes: isNaN(minutes) ? 0 : minutes,
+        totalMinutes: (isNaN(hours) ? 0 : hours) * 60 + (isNaN(minutes) ? 0 : minutes)
       };
     });
     
     // Render prayer times
+    // Using escapeHtml for data from external API
     grid.innerHTML = parsedPrayers.map(prayer => `
       <div class="prayer-card" data-prayer="${prayer.key}">
         <span class="prayer-arabic">${prayer.arabic}</span>
         <span class="prayer-name">${prayer.name}</span>
-        <span class="prayer-time">${data.timings[prayer.key]}</span>
+        <span class="prayer-time">${escapeHtml(data.timings[prayer.key])}</span>
       </div>
     `).join('');
 
