@@ -158,23 +158,43 @@
     container?.addEventListener('click', (e) => {
       const btn = e.target.closest('.remove-btn') as HTMLButtonElement | null;
       if (btn) {
-        const currentRow = btn.closest('.course-row');
         const rows = Array.from(container.querySelectorAll('.course-row'));
 
         if (rows.length > 1) {
           const currentRow = btn.closest('.course-row');
+          if (!currentRow || currentRow.classList.contains('removing')) return;
 
-          // Find the next element to focus before removing
-          // Prioritize the next row, then the previous row
-          let nextFocusTarget = currentRow.nextElementSibling?.querySelector('.remove-btn');
-          if (!nextFocusTarget) {
-            nextFocusTarget = currentRow.previousElementSibling?.querySelector('.remove-btn');
-          }
+          const executeRemoval = () => {
+            // Re-check row count to prevent race conditions during animation
+            if (container.querySelectorAll('.course-row').length <= 1) {
+              currentRow.classList.remove('removing');
+              return;
+            }
 
-          currentRow.remove();
+            // Find the next element to focus before removing
+            // Prioritize the next row, then the previous row
+            let nextFocusTarget = currentRow.nextElementSibling?.querySelector('.remove-btn');
+            if (!nextFocusTarget) {
+              nextFocusTarget = currentRow.previousElementSibling?.querySelector('.remove-btn');
+            }
 
-          if (nextFocusTarget) {
-            (nextFocusTarget as HTMLElement).focus();
+            currentRow.remove();
+
+            if (nextFocusTarget) {
+              (nextFocusTarget as HTMLElement).focus();
+            }
+            // Ensure buttons state is updated after removal
+            updateRemoveButtons();
+          };
+
+          const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+          if (prefersReducedMotion) {
+            executeRemoval();
+          } else {
+            currentRow.classList.add('removing');
+            // Match CSS animation duration (0.2s)
+            setTimeout(executeRemoval, 200);
           }
         }
       }
