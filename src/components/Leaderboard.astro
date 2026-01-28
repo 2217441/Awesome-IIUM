@@ -13,23 +13,70 @@
 <script>
   async function fetchContributors() {
     try {
-      const response = await fetch('https://api.github.com/repos/iiumstudent/Awesome-IIUM/contributors?per_page=12');
+      const response = await fetch(
+        "https://api.github.com/repos/iiumstudent/Awesome-IIUM/contributors?per_page=12",
+      );
       const data = await response.json();
-      const list = document.getElementById('contributor-list');
+      const list = document.getElementById("contributor-list");
       if (!list) return;
-      
-      list.innerHTML = data.map((user, index) => `
-        <a href="${user.html_url}" target="_blank" class="contributor-card rank-${index + 1}">
-          <div class="rank">#${index + 1}</div>
-          <img src="${user.avatar_url}" alt="${user.login}" class="avatar" />
-          <div class="info">
-            <span class="username">${user.login}</span>
-            <span class="contributions">${user.contributions} Contributions</span>
-          </div>
-        </a>
-      `).join('');
+
+      list.innerHTML = ""; // Clear loading message
+
+      data.forEach((user, index) => {
+        // Basic URL validation
+        try {
+          const profileUrl = new URL(user.html_url);
+          const avatarUrl = new URL(user.avatar_url);
+          if (
+            profileUrl.protocol !== "https:" ||
+            avatarUrl.protocol !== "https:"
+          )
+            return;
+        } catch {
+          return;
+        }
+
+        const link = document.createElement("a");
+        link.href = user.html_url;
+        link.target = "_blank";
+        link.rel = "noopener noreferrer";
+        link.className = `contributor-card rank-${index + 1}`;
+
+        const rankDiv = document.createElement("div");
+        rankDiv.className = "rank";
+        rankDiv.textContent = `#${index + 1}`;
+        link.appendChild(rankDiv);
+
+        const img = document.createElement("img");
+        img.src = user.avatar_url;
+        img.alt = user.login;
+        img.className = "avatar";
+        link.appendChild(img);
+
+        const infoDiv = document.createElement("div");
+        infoDiv.className = "info";
+
+        const usernameSpan = document.createElement("span");
+        usernameSpan.className = "username";
+        usernameSpan.textContent = user.login;
+        infoDiv.appendChild(usernameSpan);
+
+        const contributionsSpan = document.createElement("span");
+        contributionsSpan.className = "contributions";
+        contributionsSpan.textContent = `${user.contributions} Contributions`;
+        infoDiv.appendChild(contributionsSpan);
+
+        link.appendChild(infoDiv);
+        list.appendChild(link);
+      });
     } catch (e) {
-      console.error('Failed to fetch contributors', e);
+      console.error("Failed to fetch contributors", e);
+      const list = document.getElementById("contributor-list");
+      if (list) {
+        list.textContent = "Failed to load contributors.";
+        list.style.textAlign = "center";
+        list.style.color = "var(--sl-color-gray-3)";
+      }
     }
   }
 
