@@ -50,6 +50,22 @@ export default defineConfig({
 			description:
 				'A curated list of resources for the International Islamic University Malaysia (IIUM) community.',
 			head: [
+				// Security Headers
+				{
+					tag: 'meta',
+					attrs: {
+						name: 'referrer',
+						content: 'strict-origin-when-cross-origin',
+					},
+				},
+				{
+					tag: 'meta',
+					attrs: {
+						'http-equiv': 'Content-Security-Policy',
+						content:
+							"default-src 'self'; script-src 'self' 'unsafe-inline' https://gc.zgo.at https://unpkg.com https://giscus.app; style-src 'self' 'unsafe-inline' https://unpkg.com https://giscus.app; img-src 'self' data: https:; connect-src 'self' https://api.aladhan.com https://api.github.com https://giscus.app https://2217441.goatcounter.com; frame-src https://giscus.app; font-src 'self' data:; object-src 'none'; base-uri 'self'; upgrade-insecure-requests;",
+					},
+				},
 				{
 					tag: 'meta',
 					attrs: {
