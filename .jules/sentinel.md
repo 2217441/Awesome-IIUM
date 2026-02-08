@@ -22,3 +22,8 @@ using an escape helper or use `textContent` / DOM creation methods instead of
 **Vulnerability:** The `ErrorBoundary` component injected error messages directly into `innerHTML` without sanitization, allowing XSS if a child component threw an error containing HTML.
 **Learning:** `document.currentScript` is unreliable in Astro client scripts, leading to component failure (which masked the XSS). Reliable selection requires generated IDs.
 **Prevention:** Always use `escapeHtml` for dynamic data in `innerHTML`. Use unique IDs passed via `define:vars` for robust DOM selection in Astro.
+
+## 2026-02-05 - Missing CSP on GitHub Pages (Deployment Gap)
+**Vulnerability:** CSP defined in `public/_headers` was ignored by GitHub Pages, leaving the site unprotected against XSS despite intent.
+**Learning:** Deployment platforms vary in how they handle headers. GitHub Pages ignores `_headers` (Netlify convention).
+**Prevention:** For static sites on GitHub Pages, use `<meta http-equiv="Content-Security-Policy">` in HTML head as the primary enforcement mechanism.

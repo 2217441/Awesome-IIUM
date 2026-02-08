@@ -53,6 +53,21 @@ export default defineConfig({
 				{
 					tag: 'meta',
 					attrs: {
+						'http-equiv': 'Content-Security-Policy',
+						content:
+							"default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://*.goatcounter.com https://gc.zgo.at https://giscus.app https://unpkg.com; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://giscus.app https://unpkg.com; img-src 'self' data: https: https://tile.openstreetmap.org https://github.com https://avatars.githubusercontent.com https://giscus.app; font-src 'self' data: https://cdn.jsdelivr.net; connect-src 'self' https://api.github.com https://*.goatcounter.com https://2217441.goatcounter.com https://giscus.app https://api.aladhan.com; frame-src https://giscus.app https://www.openstreetmap.org; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests;",
+					},
+				},
+				{
+					tag: 'meta',
+					attrs: {
+						name: 'referrer',
+						content: 'strict-origin-when-cross-origin',
+					},
+				},
+				{
+					tag: 'meta',
+					attrs: {
 						name: 'theme-color',
 						content: '#ffffff',
 					},
