@@ -53,6 +53,21 @@ export default defineConfig({
 				{
 					tag: 'meta',
 					attrs: {
+						'http-equiv': 'Content-Security-Policy',
+						content:
+							"default-src 'self'; script-src 'self' 'unsafe-inline' https://giscus.app https://unpkg.com https://gc.zgo.at https://*.goatcounter.com; style-src 'self' 'unsafe-inline' https://unpkg.com https://giscus.app; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https://api.github.com https://api.aladhan.com https://giscus.app https://*.goatcounter.com https://gc.zgo.at; frame-src https://giscus.app; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests;",
+					},
+				},
+				{
+					tag: 'meta',
+					attrs: {
+						name: 'referrer',
+						content: 'strict-origin-when-cross-origin',
+					},
+				},
+				{
+					tag: 'meta',
+					attrs: {
 						name: 'theme-color',
 						content: '#ffffff',
 					},
