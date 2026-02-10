@@ -82,6 +82,8 @@ const hasInitialData = initialStatus.length > 0;
 </div>
 
 <script define:vars={{ BASE_URL, hasInitialData }}>
+  let lastDataString = '';
+
   function updateLastUpdatedTimestamp() {
     const lastUpdated = document.getElementById('last-updated');
     if (lastUpdated) {
@@ -90,6 +92,9 @@ const hasInitialData = initialStatus.length > 0;
   }
 
   async function fetchStatus() {
+    // Bolt Optimization: Skip fetch if tab is hidden to save battery/bandwidth
+    if (document.hidden) return;
+
     try {
       const baseUrl = BASE_URL.endsWith('/') ? BASE_URL : `${BASE_URL}/`;
       const response = await fetch(`${baseUrl}api/status.json`);
@@ -98,6 +103,14 @@ const hasInitialData = initialStatus.length > 0;
       if (!Array.isArray(data)) {
         throw new Error('Invalid status data format');
       }
+
+      // Bolt Optimization: Prevent redundant DOM updates if data hasn't changed
+      const currentDataString = JSON.stringify(data);
+      if (currentDataString === lastDataString) {
+        updateLastUpdatedTimestamp();
+        return;
+      }
+      lastDataString = currentDataString;
 
       const grid = document.getElementById('status-grid');
       if (!grid) return;
@@ -160,6 +173,13 @@ const hasInitialData = initialStatus.length > 0;
   }
 
   setInterval(fetchStatus, 300000); // Refresh every 5 minutes (matches cache TTL)
+
+  // Bolt Optimization: Immediately refresh when tab becomes visible if needed
+  document.addEventListener('visibilitychange', () => {
+    if (!document.hidden) {
+      fetchStatus();
+    }
+  });
 </script>
 
 <style>
