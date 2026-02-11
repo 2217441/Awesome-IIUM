@@ -61,7 +61,7 @@ const hasInitialData = initialStatus.length > 0;
     {
       initialStatus.length > 0 ? (
         initialStatus.map((sys) => (
-          <div class={`status-card ${sys.status}`}>
+          <div class={`status-card ${sys.status}`} data-name={sys.name}>
             <div class="status-header">
               <span class="status-dot" />
               <h3>{sys.name}</h3>
@@ -82,7 +82,7 @@ const hasInitialData = initialStatus.length > 0;
 </div>
 
 <script define:vars={{ BASE_URL, hasInitialData }}>
-  let lastDataString = '';
+  let lastDataJson = '';
 
   function updateLastUpdatedTimestamp() {
     const lastUpdated = document.getElementById('last-updated');
@@ -91,9 +91,13 @@ const hasInitialData = initialStatus.length > 0;
     }
   }
 
+  let shouldUpdateOnVisible = false;
+
   async function fetchStatus() {
-    // Bolt Optimization: Skip fetch if tab is hidden to save battery/bandwidth
-    if (document.hidden) return;
+    if (document.hidden) {
+      shouldUpdateOnVisible = true;
+      return;
+    }
 
     try {
       const baseUrl = BASE_URL.endsWith('/') ? BASE_URL : `${BASE_URL}/`;
@@ -104,60 +108,100 @@ const hasInitialData = initialStatus.length > 0;
         throw new Error('Invalid status data format');
       }
 
-      // Bolt Optimization: Prevent redundant DOM updates if data hasn't changed
-      const currentDataString = JSON.stringify(data);
-      if (currentDataString === lastDataString) {
+      // Bolt Optimization: Prevent redundant DOM updates
+      const currentDataJson = JSON.stringify(data);
+      if (currentDataJson === lastDataJson) {
         updateLastUpdatedTimestamp();
         return;
       }
-      lastDataString = currentDataString;
+      lastDataJson = currentDataJson;
 
       const grid = document.getElementById('status-grid');
       if (!grid) return;
 
-      // Clear existing content securely
-      grid.replaceChildren();
+      // Map existing cards for reuse
+      const existingCards = new Map();
+      Array.from(grid.children).forEach((child) => {
+        if (child.classList.contains('status-card')) {
+          const name = child.getAttribute('data-name');
+          if (name) existingCards.set(name, child);
+        } else if (child.classList.contains('loading')) {
+          child.remove();
+        }
+      });
+
+      const processedNames = new Set();
 
       data.forEach((sys) => {
-        const card = document.createElement('div');
+        processedNames.add(sys.name);
         // Validate status class to alphanumeric characters only to prevent CSS injection
         const safeStatus = (sys.status || '').replace(/[^a-z0-9-]/gi, '');
-        card.className = `status-card ${safeStatus}`;
 
-        const header = document.createElement('div');
-        header.className = 'status-header';
+        let card = existingCards.get(sys.name);
 
-        const dot = document.createElement('span');
-        dot.className = 'status-dot';
+        if (card) {
+          // Update existing card
+          card.className = `status-card ${safeStatus}`;
 
-        const h3 = document.createElement('h3');
-        h3.textContent = sys.name || 'Unknown System';
+          const label = card.querySelector('.status-label');
+          if (label) label.textContent = (sys.status || '').toUpperCase();
 
-        header.appendChild(dot);
-        header.appendChild(h3);
+          const time = card.querySelector('.status-time');
+          if (time) {
+            try {
+              time.textContent = `Last Checked: ${new Date(sys.timestamp).toLocaleTimeString()}`;
+            } catch (e) {
+               // Keep existing time or set to unknown
+            }
+          }
+        } else {
+          // Create new card
+          card = document.createElement('div');
+          card.className = `status-card ${safeStatus}`;
+          card.setAttribute('data-name', sys.name);
 
-        const body = document.createElement('div');
-        body.className = 'status-body';
+          const header = document.createElement('div');
+          header.className = 'status-header';
 
-        const label = document.createElement('span');
-        label.className = 'status-label';
-        label.textContent = (sys.status || '').toUpperCase();
+          const dot = document.createElement('span');
+          dot.className = 'status-dot';
 
-        const time = document.createElement('span');
-        time.className = 'status-time';
-        try {
-          time.textContent = `Last Checked: ${new Date(sys.timestamp).toLocaleTimeString()}`;
-        } catch (e) {
-          time.textContent = 'Last Checked: Unknown';
+          const h3 = document.createElement('h3');
+          h3.textContent = sys.name || 'Unknown System';
+
+          header.appendChild(dot);
+          header.appendChild(h3);
+
+          const body = document.createElement('div');
+          body.className = 'status-body';
+
+          const label = document.createElement('span');
+          label.className = 'status-label';
+          label.textContent = (sys.status || '').toUpperCase();
+
+          const time = document.createElement('span');
+          time.className = 'status-time';
+          try {
+            time.textContent = `Last Checked: ${new Date(sys.timestamp).toLocaleTimeString()}`;
+          } catch (e) {
+            time.textContent = 'Last Checked: Unknown';
+          }
+
+          body.appendChild(label);
+          body.appendChild(time);
+
+          card.appendChild(header);
+          card.appendChild(body);
+
+          grid.appendChild(card);
         }
+      });
 
-        body.appendChild(label);
-        body.appendChild(time);
-
-        card.appendChild(header);
-        card.appendChild(body);
-
-        grid.appendChild(card);
+      // Remove stale cards
+      existingCards.forEach((card, name) => {
+        if (!processedNames.has(name)) {
+          card.remove();
+        }
       });
 
       // Update last updated timestamp
@@ -167,14 +211,27 @@ const hasInitialData = initialStatus.length > 0;
     }
   }
 
+  // Handle visibility changes
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible' && shouldUpdateOnVisible) {
+      shouldUpdateOnVisible = false;
+      fetchStatus();
+    }
+  });
+
   // Initial fetch if no SSG data
   if (!hasInitialData) {
     fetchStatus();
   }
 
-  setInterval(fetchStatus, 300000); // Refresh every 5 minutes (matches cache TTL)
+  // Bolt Optimization: Pause polling when hidden
+  setInterval(() => {
+    if (!document.hidden) {
+      fetchStatus();
+    }
+  }, 300000); // Refresh every 5 minutes (matches cache TTL)
 
-  // Bolt Optimization: Immediately refresh when tab becomes visible if needed
+  // Bolt Optimization: Refresh immediately when tab becomes visible
   document.addEventListener('visibilitychange', () => {
     if (!document.hidden) {
       fetchStatus();
