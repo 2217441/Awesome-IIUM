@@ -139,6 +139,11 @@ try {
       console.warn('Cache read error:', e);
     }
     
+    // Set loading state
+    const grid = document.getElementById('prayer-grid');
+    grid.classList.add('is-loading');
+    grid.setAttribute('aria-busy', 'true');
+
     try {
       const res = await fetch(
         `https://api.aladhan.com/v1/timings/${date}?latitude=${campus.lat}&longitude=${campus.lng}&method=3`
@@ -160,6 +165,10 @@ try {
       console.error('Failed to fetch prayer times:', e);
       document.getElementById('prayer-grid').innerHTML = 
         '<p class="error">Failed to load prayer times. Please try again.</p>';
+    } finally {
+      // Remove loading state
+      grid.classList.remove('is-loading');
+      grid.removeAttribute('aria-busy');
     }
   }
 
@@ -354,6 +363,13 @@ try {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 0.5rem;
+    transition: opacity 0.2s ease, filter 0.2s ease;
+  }
+
+  .prayer-grid.is-loading {
+    opacity: 0.5;
+    filter: grayscale(1);
+    pointer-events: none;
   }
 
   @media (max-width: 500px) {
