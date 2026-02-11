@@ -91,11 +91,8 @@ const hasInitialData = initialStatus.length > 0;
     }
   }
 
-  let shouldUpdateOnVisible = false;
-
   async function fetchStatus() {
     if (document.hidden) {
-      shouldUpdateOnVisible = true;
       return;
     }
 
@@ -211,25 +208,13 @@ const hasInitialData = initialStatus.length > 0;
     }
   }
 
-  // Handle visibility changes
-  document.addEventListener('visibilitychange', () => {
-    if (document.visibilityState === 'visible' && shouldUpdateOnVisible) {
-      shouldUpdateOnVisible = false;
-      fetchStatus();
-    }
-  });
-
   // Initial fetch if no SSG data
   if (!hasInitialData) {
     fetchStatus();
   }
 
   // Bolt Optimization: Pause polling when hidden
-  setInterval(() => {
-    if (!document.hidden) {
-      fetchStatus();
-    }
-  }, 300000); // Refresh every 5 minutes (matches cache TTL)
+  setInterval(fetchStatus, 300000); // Refresh every 5 minutes (matches cache TTL)
 
   // Bolt Optimization: Refresh immediately when tab becomes visible
   document.addEventListener('visibilitychange', () => {
