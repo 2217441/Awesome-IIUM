@@ -23,7 +23,7 @@ using an escape helper or use `textContent` / DOM creation methods instead of
 **Learning:** `document.currentScript` is unreliable in Astro client scripts, leading to component failure (which masked the XSS). Reliable selection requires generated IDs.
 **Prevention:** Always use `escapeHtml` for dynamic data in `innerHTML`. Use unique IDs passed via `define:vars` for robust DOM selection in Astro.
 
-## 2026-02-05 - Missing CSP on GitHub Pages (Deployment Gap)
-**Vulnerability:** CSP defined in `public/_headers` was ignored by GitHub Pages, leaving the site unprotected against XSS despite intent.
-**Learning:** Deployment platforms vary in how they handle headers. GitHub Pages ignores `_headers` (Netlify convention).
-**Prevention:** For static sites on GitHub Pages, use `<meta http-equiv="Content-Security-Policy">` in HTML head as the primary enforcement mechanism.
+## 2026-02-07 - Security Headers via Meta Tags (Static Site)
+**Vulnerability:** Lack of security headers (CSP, Referrer-Policy) on GitHub Pages deployment.
+**Learning:** For static hosting platforms like GitHub Pages where HTTP headers are not customizable, critical security headers can be enforced via `<meta>` tags injected at build time (e.g., in Astro config).
+**Prevention:** Configure `astro.config.mjs` to inject `Content-Security-Policy` and `Referrer-Policy` meta tags in the `<head>`.
