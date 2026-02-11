@@ -22,3 +22,8 @@ using an escape helper or use `textContent` / DOM creation methods instead of
 **Vulnerability:** The `ErrorBoundary` component injected error messages directly into `innerHTML` without sanitization, allowing XSS if a child component threw an error containing HTML.
 **Learning:** `document.currentScript` is unreliable in Astro client scripts, leading to component failure (which masked the XSS). Reliable selection requires generated IDs.
 **Prevention:** Always use `escapeHtml` for dynamic data in `innerHTML`. Use unique IDs passed via `define:vars` for robust DOM selection in Astro.
+
+## 2026-02-07 - Security Headers via Meta Tags (Static Site)
+**Vulnerability:** Lack of security headers (CSP, Referrer-Policy) on GitHub Pages deployment.
+**Learning:** For static hosting platforms like GitHub Pages where HTTP headers are not customizable, critical security headers can be enforced via `<meta>` tags injected at build time (e.g., in Astro config).
+**Prevention:** Configure `astro.config.mjs` to inject `Content-Security-Policy` and `Referrer-Policy` meta tags in the `<head>`.
