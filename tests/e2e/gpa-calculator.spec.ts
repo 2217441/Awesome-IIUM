@@ -204,4 +204,36 @@ test.describe('GPA Calculator', () => {
 		await expect(gradeSelect).toHaveClass(/input-error/);
 		await expect(gradeSelect).toBeFocused();
 	});
+
+	test('should calculate semester GPA on Ctrl+Enter shortcut', async ({
+		page,
+	}) => {
+		// Fill first course: Course 1, Grade A (4.00), 3 credits
+		await page
+			.locator('.course-row')
+			.first()
+			.locator('.course-name')
+			.fill('Keyboard Shortcut Test');
+		await page
+			.locator('.course-row')
+			.first()
+			.locator('.grade')
+			.selectOption('4.00');
+		await page
+			.locator('.course-row')
+			.first()
+			.locator('.credits')
+			.selectOption('3');
+
+		// Press Ctrl+Enter
+		await page.keyboard.down('Control');
+		await page.keyboard.press('Enter');
+		await page.keyboard.up('Control');
+
+		// Wait for results
+		await expect(page.locator('#results')).toBeVisible();
+
+		// Verify GPA: 4.00
+		await expect(page.locator('#semester-gpa')).toContainText('4.00');
+	});
 });
