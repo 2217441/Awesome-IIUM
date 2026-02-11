@@ -45,7 +45,7 @@
 
     <div class="actions">
       <button id="add-course" class="btn-secondary" type="button">+ Add Course</button>
-      <button id="calculate" class="btn-primary" type="button">Calculate GPA</button>
+      <button id="calculate" class="btn-primary" type="button" title="Press Ctrl+Enter to calculate">Calculate GPA</button>
       <button id="clear-all" class="btn-ghost" type="button">Clear All</button>
     </div>
 
@@ -149,6 +149,20 @@
       if (btn) (btn as HTMLButtonElement).disabled = true;
     }
 
+    // Keyboard shortcut for calculation (Ctrl+Enter or Cmd+Enter)
+    container?.closest('.gpa-calculator')?.addEventListener('keydown', (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+        e.preventDefault();
+        calcBtn?.click();
+
+        // Visual feedback on button
+        if (calcBtn) {
+          calcBtn.classList.add('active');
+          setTimeout(() => calcBtn.classList.remove('active'), 200);
+        }
+      }
+    });
+
     // Keyboard navigation for adding rows
     container?.addEventListener('keydown', (e) => {
       if (e.key === 'Enter') {
@@ -156,7 +170,8 @@
         const row = target.closest('.course-row');
 
         // Only trigger if we are inside a course row input/select
-        if (row && (target.tagName === 'INPUT' || target.tagName === 'SELECT')) {
+        // Bolt Optimization: Ensure no modifiers are pressed to allow for other shortcuts
+        if (row && (target.tagName === 'INPUT' || target.tagName === 'SELECT') && !e.ctrlKey && !e.metaKey && !e.altKey) {
           e.preventDefault();
 
           if (!row.nextElementSibling) {
@@ -648,6 +663,12 @@
 
   .btn-primary:hover {
     filter: brightness(1.1);
+  }
+
+  .btn-primary:active,
+  .btn-primary.active {
+    transform: translateY(1px);
+    filter: brightness(0.95);
   }
 
   .btn-primary:disabled,
