@@ -1,0 +1,10 @@
+
+> awesome-iium@1.0.0 preview /app
+> astro preview "--host" "0.0.0.0" "--port" "4321"
+
+06:31:06 [WARN] [@sentry/astro] You passed in additional options (dsn, environment, release) to the Sentry integration. This is deprecated and will stop working in a future version. Instead, configure the Sentry SDK in your `sentry.client.config.(js|ts)` or `sentry.server.config.(js|ts)` files.
+
+ astro  v5.17.1 ready in 7 ms
+
+┃ Local    http://localhost:4321/Awesome-IIUM
+┃ Network  http://192.168.0.2:4321/Awesome-IIUM
