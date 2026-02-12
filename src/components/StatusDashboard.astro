@@ -224,19 +224,14 @@ const hasInitialData = initialStatus.length > 0;
     fetchStatus();
   }
 
-  // Bolt Optimization: Pause polling when hidden
+  // Bolt Optimization: Pause polling when hidden, but mark for update
   setInterval(() => {
-    if (!document.hidden) {
+    if (document.hidden) {
+      shouldUpdateOnVisible = true;
+    } else {
       fetchStatus();
     }
   }, 300000); // Refresh every 5 minutes (matches cache TTL)
-
-  // Bolt Optimization: Refresh immediately when tab becomes visible
-  document.addEventListener('visibilitychange', () => {
-    if (!document.hidden) {
-      fetchStatus();
-    }
-  });
 </script>
 
 <style>
