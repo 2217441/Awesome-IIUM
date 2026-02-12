@@ -178,7 +178,7 @@ const activities = await fetchActivity();
             <div class="meta">
               <span class="user">@{activity.user}</span>
               <span class="dot">•</span>
-              <span class="date">{activity.date}</span>
+              <span class="date" data-timestamp={activity.timestamp} title={new Date(activity.timestamp).toLocaleString()}>{activity.date}</span>
             </div>
           </div>
         </li>
@@ -297,3 +297,34 @@ const activities = await fetchActivity();
     margin: 1rem 0;
   }
 </style>
+
+<script>
+  // UX Enhancement: Convert absolute dates to relative time (e.g., "2 days ago")
+  function getRelativeTime(timestamp) {
+    const rtf = new Intl.RelativeTimeFormat('en', { numeric: 'auto' });
+    const now = Date.now();
+    const diff = timestamp - now;
+    const diffSeconds = Math.round(diff / 1000);
+    const diffMinutes = Math.round(diff / (1000 * 60));
+    const diffHours = Math.round(diff / (1000 * 60 * 60));
+    const diffDays = Math.round(diff / (1000 * 60 * 60 * 24));
+
+    if (Math.abs(diffSeconds) < 60) return 'just now';
+    if (Math.abs(diffMinutes) < 60) return rtf.format(diffMinutes, 'minute');
+    if (Math.abs(diffHours) < 24) return rtf.format(diffHours, 'hour');
+    return rtf.format(diffDays, 'day');
+  }
+
+  // Update dates on load
+  document.querySelectorAll('.date[data-timestamp]').forEach((el) => {
+    try {
+      const timestamp = parseInt(el.getAttribute('data-timestamp') || '0', 10);
+      if (timestamp > 0) {
+        el.textContent = getRelativeTime(timestamp);
+      }
+    } catch (e) {
+      // Fallback to original server-rendered date
+      console.debug('Failed to format relative time', e);
+    }
+  });
+</script>
