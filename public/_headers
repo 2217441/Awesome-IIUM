@@ -6,7 +6,7 @@
 
 # Content Security Policy - Controls what resources can be loaded
 
-  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' https://cdn.jsdelivr.net https://*.goatcounter.com https://giscus.app https://unpkg.com https://gc.zgo.at; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://giscus.app https://unpkg.com; img-src 'self' data: https:; font-src 'self' data: https://cdn.jsdelivr.net; connect-src 'self' https://api.github.com https://*.goatcounter.com https://giscus.app https://api.aladhan.com https://2217441.goatcounter.com; frame-src https://giscus.app https://www.openstreetmap.org; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; upgrade-insecure-requests
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' blob: https://cdn.jsdelivr.net https://*.goatcounter.com https://gc.zgo.at https://giscus.app https://unpkg.com; worker-src 'self' blob:; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://giscus.app https://unpkg.com; img-src 'self' data: https:; font-src 'self' data: https://cdn.jsdelivr.net; connect-src 'self' https://api.github.com https://*.goatcounter.com https://gc.zgo.at https://giscus.app https://api.aladhan.com https://2217441.goatcounter.com; frame-src https://giscus.app https://www.openstreetmap.org; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; upgrade-insecure-requests
   
 # Prevent clickjacking attacks
 
