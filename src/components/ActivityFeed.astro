@@ -178,7 +178,7 @@ const activities = await fetchActivity();
             <div class="meta">
               <span class="user">@{activity.user}</span>
               <span class="dot">•</span>
-              <span class="date">{activity.date}</span>
+              <span class="date" data-timestamp={activity.timestamp} title={new Date(activity.timestamp).toLocaleString()}>{activity.date}</span>
             </div>
           </div>
         </li>
@@ -192,6 +192,28 @@ const activities = await fetchActivity();
     View all activity →
   </a>
 </div>
+
+<script>
+  import { timeAgo } from '../utils/time';
+
+  function updateDates() {
+    const dates = document.querySelectorAll('.date[data-timestamp]');
+    const lang = document.documentElement.lang || 'en';
+
+    dates.forEach((dateEl) => {
+      const timestamp = parseInt(dateEl.getAttribute('data-timestamp') || '0', 10);
+      if (timestamp) {
+        dateEl.textContent = timeAgo(timestamp, lang);
+      }
+    });
+  }
+
+  // Initial update
+  updateDates();
+
+  // Update every minute to keep relative time fresh
+  setInterval(updateDates, 60000);
+</script>
 
 <style>
   .activity-feed {
