@@ -83,6 +83,9 @@ const hasInitialData = initialStatus.length > 0;
 
 <script define:vars={{ BASE_URL, hasInitialData }}>
   let lastDataJson = '';
+  // Bolt Optimization: Track last fetch time to throttle redundant visibility fetches
+  let lastFetchTimestamp = 0;
+  let shouldUpdateOnVisible = false;
 
   function updateLastUpdatedTimestamp() {
     const lastUpdated = document.getElementById('last-updated');
@@ -91,9 +94,8 @@ const hasInitialData = initialStatus.length > 0;
     }
   }
 
-  let shouldUpdateOnVisible = false;
-
   async function fetchStatus() {
+    // If called directly while hidden, mark for update on visible
     if (document.hidden) {
       shouldUpdateOnVisible = true;
       return;
@@ -103,6 +105,9 @@ const hasInitialData = initialStatus.length > 0;
       const baseUrl = BASE_URL.endsWith('/') ? BASE_URL : `${BASE_URL}/`;
       const response = await fetch(`${baseUrl}api/status.json`);
       const data = await response.json();
+
+      // Update timestamp on successful fetch
+      lastFetchTimestamp = Date.now();
 
       if (!Array.isArray(data)) {
         throw new Error('Invalid status data format');
@@ -211,30 +216,35 @@ const hasInitialData = initialStatus.length > 0;
     }
   }
 
-  // Handle visibility changes
-  document.addEventListener('visibilitychange', () => {
-    if (document.visibilityState === 'visible' && shouldUpdateOnVisible) {
-      shouldUpdateOnVisible = false;
-      fetchStatus();
-    }
-  });
-
   // Initial fetch if no SSG data
   if (!hasInitialData) {
     fetchStatus();
+  } else {
+    // If we have initial data (SSG), set timestamp to now so we don't fetch immediately on visibility change
+    lastFetchTimestamp = Date.now();
   }
 
-  // Bolt Optimization: Pause polling when hidden
+  // Bolt Optimization: Background polling
   setInterval(() => {
-    if (!document.hidden) {
+    if (document.hidden) {
+      shouldUpdateOnVisible = true;
+    } else {
       fetchStatus();
     }
   }, 300000); // Refresh every 5 minutes (matches cache TTL)
 
-  // Bolt Optimization: Refresh immediately when tab becomes visible
+  // Bolt Optimization: Throttle visibility updates
+  // Only fetch if data is stale (> 60s) or we missed a background update
+  const STALE_THRESHOLD = 60000; // 1 minute
+
   document.addEventListener('visibilitychange', () => {
     if (!document.hidden) {
-      fetchStatus();
+      const isStale = (Date.now() - lastFetchTimestamp) > STALE_THRESHOLD;
+
+      if (shouldUpdateOnVisible || isStale) {
+        shouldUpdateOnVisible = false;
+        fetchStatus();
+      }
     }
   });
 </script>
