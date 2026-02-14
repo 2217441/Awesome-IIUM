@@ -37,3 +37,8 @@ especially in dynamically generated rows where structure might be less obvious.
 
 **Learning:** Visual status dashboards that update in the background (via `setInterval`) provide no feedback to screen reader users, leaving them unaware of potentially critical changes.
 **Action:** Add `aria-live="polite"` to the timestamp or status summary element. This ensures updates are announced non-intrusively, keeping all users informed of the system state.
+
+## 2026-02-19 - Error Recovery in Dashboards
+
+**Learning:** When async data loading fails, leaving users in a perpetual "loading" state is a poor experience. Console errors are invisible to users.
+**Action:** Always implement a user-facing error state with a clear recovery action (e.g., "Retry" button) to empower users to resolve transient network issues without a full page refresh.
