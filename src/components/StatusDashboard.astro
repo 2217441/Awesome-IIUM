@@ -63,7 +63,7 @@ const hasInitialData = initialStatus.length > 0;
         initialStatus.map((sys) => (
           <div class={`status-card ${sys.status}`} data-name={sys.name}>
             <div class="status-header">
-              <span class="status-dot" />
+              <span class="status-dot" aria-hidden="true" />
               <h3>{sys.name}</h3>
             </div>
             <div class="status-body">
@@ -92,6 +92,28 @@ const hasInitialData = initialStatus.length > 0;
   }
 
   let shouldUpdateOnVisible = false;
+
+  function renderError() {
+    const grid = document.getElementById('status-grid');
+    if (
+      grid &&
+      (grid.children.length === 0 || grid.querySelector('.loading'))
+    ) {
+      grid.innerHTML = `
+          <div class="error-state">
+            <p>⚠️ Failed to load system status.</p>
+            <button id="retry-btn" class="retry-btn">Retry</button>
+          </div>
+        `;
+      const retryBtn = document.getElementById('retry-btn');
+      if (retryBtn) {
+        retryBtn.addEventListener('click', () => {
+          grid.innerHTML = '<div class="loading">Loading system status...</div>';
+          fetchStatus();
+        });
+      }
+    }
+  }
 
   async function fetchStatus() {
     if (document.hidden) {
@@ -165,6 +187,7 @@ const hasInitialData = initialStatus.length > 0;
 
           const dot = document.createElement('span');
           dot.className = 'status-dot';
+          dot.setAttribute('aria-hidden', 'true');
 
           const h3 = document.createElement('h3');
           h3.textContent = sys.name || 'Unknown System';
@@ -208,6 +231,7 @@ const hasInitialData = initialStatus.length > 0;
       updateLastUpdatedTimestamp();
     } catch (e) {
       console.error('Failed to fetch status', e);
+      renderError();
     }
   }
 
@@ -309,5 +333,29 @@ const hasInitialData = initialStatus.length > 0;
     grid-column: 1 / -1;
     text-align: center;
     padding: 3rem;
+  }
+
+  .error-state {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 2rem;
+    color: var(--sl-color-gray-3);
+  }
+
+  .retry-btn {
+    margin-top: 1rem;
+    padding: 0.5rem 1rem;
+    background: var(--sl-color-bg-nav);
+    border: 1px solid var(--sl-color-hairline-light);
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.875rem;
+    color: inherit;
+    transition: all 0.2s;
+  }
+
+  .retry-btn:hover {
+    border-color: var(--sl-color-accent);
+    color: var(--sl-color-accent);
   }
 </style>
