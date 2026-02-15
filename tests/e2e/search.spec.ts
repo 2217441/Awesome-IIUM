@@ -75,7 +75,7 @@ test.describe('Search Functionality', () => {
 
 			// Should have at least some results
 			expect(resultCount).toBeGreaterThan(0);
-		} catch (e) {
+		} catch (_e) {
 			console.log('Search results not found within timeout');
 			// If search fails, we check if the input is at least still visible
 			await expect(searchInput).toBeVisible();
