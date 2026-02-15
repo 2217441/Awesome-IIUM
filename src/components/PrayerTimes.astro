@@ -248,6 +248,22 @@ try {
       cachedTargetTime = target;
     }
 
+    // Update countdown accessibility and tooltip
+    if (nextPrayer && cachedTargetTime) {
+      const countdownEl = document.getElementById('countdown');
+      if (countdownEl) {
+        // Format time like "5:30 PM" or "05:30" depending on locale
+        const timeString = cachedTargetTime.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+
+        // Add native tooltip for mouse users
+        countdownEl.title = `Next prayer at ${timeString}`;
+
+        // Add accessible label for screen readers
+        // Note: We don't use aria-live on the countdown itself to avoid spamming every second
+        countdownEl.setAttribute('aria-label', `Time remaining until ${nextPrayer.name}`);
+      }
+    }
+
     // Only update DOM if prayer changed
     if (nextPrayer && nextPrayer.key !== currentNextPrayerKey) {
       document.getElementById('next-prayer-name').textContent = nextPrayer.name;
