@@ -140,7 +140,9 @@ test.describe('Prayer Times', () => {
 		expect(title).toMatch(/^Next prayer at \d{1,2}:\d{2}(?:\s?[AP]M)?$/);
 
 		// Should have accessible label for screen readers
-		const ariaLabel = await page.locator('#countdown').getAttribute('aria-label');
+		const ariaLabel = await page
+			.locator('#countdown')
+			.getAttribute('aria-label');
 		expect(ariaLabel).toMatch(/^Time remaining until .+$/);
 	});
 
