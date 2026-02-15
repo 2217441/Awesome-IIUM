@@ -1,0 +1,32 @@
+
+> awesome-iium@1.0.0 start /app
+> astro dev
+
+▶ Astro collects anonymous usage data.
+  This information helps us improve Astro.
+  Run "astro telemetry disable" to opt-out.
+  https://astro.build/telemetry
+
+14:36:27 [WARN] [@sentry/astro] You passed in additional options (dsn, environment, release) to the Sentry integration. This is deprecated and will stop working in a future version. Instead, configure the Sentry SDK in your `sentry.client.config.(js|ts)` or `sentry.server.config.(js|ts)` files.
+14:36:27 [types] Generated 1ms
+14:36:28 [content] Syncing content
+14:36:29 [content] Synced content
+
+ astro  v5.17.1 ready in 3981 ms
+
+┃ Local    http://localhost:4321/Awesome-IIUM
+┃ Network  use --host to expose
+
+14:36:29 watching for file changes...
+14:37:19 [200] /dashboard/ 685ms
+14:37:20 [WARN] [router] A `getStaticPaths()` route pattern was matched, but no matching static path was found for requested path `/sw.js`.
+
+Possible dynamic routes being matched: node_modules/.pnpm/@astrojs+starlight@0.37.6_astro@5.17.1_@types+node@25.2.0_rollup@2.79.2_terser@5.46.0_typescript@5.9.3_yaml@2.8.2_/node_modules/@astrojs/starlight/routes/static/index.astro.
+Entry docs → 404 was not found.
+14:37:20 [404] /sw.js 44ms
+14:38:33 [200] /dashboard/ 49ms
+14:38:34 [WARN] [router] A `getStaticPaths()` route pattern was matched, but no matching static path was found for requested path `/sw.js`.
+
+Possible dynamic routes being matched: node_modules/.pnpm/@astrojs+starlight@0.37.6_astro@5.17.1_@types+node@25.2.0_rollup@2.79.2_terser@5.46.0_typescript@5.9.3_yaml@2.8.2_/node_modules/@astrojs/starlight/routes/static/index.astro.
+Entry docs → 404 was not found.
+14:38:34 [404] /sw.js 35ms

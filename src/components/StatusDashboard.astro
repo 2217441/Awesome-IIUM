@@ -83,6 +83,8 @@ const hasInitialData = initialStatus.length > 0;
 
 <script define:vars={{ BASE_URL, hasInitialData }}>
   let lastDataJson = '';
+  let lastFetchTime = 0;
+  const VISIBILITY_FETCH_THRESHOLD = 60000; // 1 minute
 
   function updateLastUpdatedTimestamp() {
     const lastUpdated = document.getElementById('last-updated');
@@ -91,18 +93,15 @@ const hasInitialData = initialStatus.length > 0;
     }
   }
 
-  let shouldUpdateOnVisible = false;
-
   async function fetchStatus() {
-    if (document.hidden) {
-      shouldUpdateOnVisible = true;
-      return;
-    }
+    if (document.hidden) return;
 
     try {
       const baseUrl = BASE_URL.endsWith('/') ? BASE_URL : `${BASE_URL}/`;
       const response = await fetch(`${baseUrl}api/status.json`);
       const data = await response.json();
+
+      lastFetchTime = Date.now();
 
       if (!Array.isArray(data)) {
         throw new Error('Invalid status data format');
@@ -211,10 +210,12 @@ const hasInitialData = initialStatus.length > 0;
     }
   }
 
-  // Handle visibility changes
+  // Bolt Optimization: Handle visibility changes efficiently
   document.addEventListener('visibilitychange', () => {
-    if (document.visibilityState === 'visible' && shouldUpdateOnVisible) {
-      shouldUpdateOnVisible = false;
+    if (document.hidden) return;
+
+    // Fetch if it has been a while since last fetch (> VISIBILITY_FETCH_THRESHOLD)
+    if (Date.now() - lastFetchTime > VISIBILITY_FETCH_THRESHOLD) {
       fetchStatus();
     }
   });
@@ -224,19 +225,8 @@ const hasInitialData = initialStatus.length > 0;
     fetchStatus();
   }
 
-  // Bolt Optimization: Pause polling when hidden
-  setInterval(() => {
-    if (!document.hidden) {
-      fetchStatus();
-    }
-  }, 300000); // Refresh every 5 minutes (matches cache TTL)
-
-  // Bolt Optimization: Refresh immediately when tab becomes visible
-  document.addEventListener('visibilitychange', () => {
-    if (!document.hidden) {
-      fetchStatus();
-    }
-  });
+  // Bolt Optimization: Refresh every 5 minutes
+  setInterval(fetchStatus, 300000);
 </script>
 
 <style>
