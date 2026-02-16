@@ -99,6 +99,8 @@ try {
   let prayerCardElements = {};
   let currentNextPrayerKey = null;
   let cachedTargetTime = null;
+  let countdownEl = null;
+  let campusSelectEl = null;
 
   async function fetchPrayerTimes(campusKey) {
     const campus = campuses[campusKey];
@@ -264,60 +266,73 @@ try {
     return { nextPrayer, nextTime };
   }
 
+  function updateCountdown() {
+    // Use cached target time to avoid recalculation and Date object creation
+    if (!cachedTargetTime) {
+      updateNextPrayer();
+      if (!cachedTargetTime) return;
+    }
+
+    const now = new Date();
+    const diff = cachedTargetTime - now;
+
+    if (diff < 0) {
+      // Refresh times when countdown ends
+      if (campusSelectEl) {
+        fetchPrayerTimes(campusSelectEl.value);
+      } else {
+        fetchPrayerTimes(defaultCampus);
+      }
+      return;
+    }
+
+    const hours = Math.floor(diff / 3600000);
+    const minutes = Math.floor((diff % 3600000) / 60000);
+    const seconds = Math.floor((diff % 60000) / 1000);
+
+    if (countdownEl) {
+      countdownEl.textContent =
+        `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+    }
+  }
+
   function startCountdown() {
     if (countdownInterval) clearInterval(countdownInterval);
-    
+
     // Initial update to set cachedTargetTime
     updateNextPrayer();
-
-    // Cache DOM elements to prevent querying every second
-    const countdownEl = document.getElementById('countdown');
-    const campusSelectEl = document.getElementById('campus-selector');
+    updateCountdown();
 
     countdownInterval = setInterval(() => {
-      // Use cached target time to avoid recalculation and Date object creation
-      if (!cachedTargetTime) {
-        updateNextPrayer();
-        if (!cachedTargetTime) return;
-      }
-
-      const now = new Date();
-      const diff = cachedTargetTime - now;
-
-      if (diff < 0) {
-        // Refresh times when countdown ends
-        if (campusSelectEl) {
-          fetchPrayerTimes(campusSelectEl.value);
-        } else {
-          fetchPrayerTimes(defaultCampus);
-        }
-        return;
-      }
-
-      const hours = Math.floor(diff / 3600000);
-      const minutes = Math.floor((diff % 3600000) / 60000);
-      const seconds = Math.floor((diff % 60000) / 1000);
-
-      if (countdownEl) {
-        countdownEl.textContent =
-          `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-      }
+      // Bolt Optimization: Pause polling when hidden to save CPU
+      if (document.hidden) return;
+      updateCountdown();
     }, 1000);
   }
 
+  // Bolt Optimization: Refresh immediately when tab becomes visible
+  document.addEventListener('visibilitychange', () => {
+    if (!document.hidden) {
+      updateCountdown();
+    }
+  });
+
   // Initialize
   document.addEventListener('DOMContentLoaded', () => {
-    const selector = document.getElementById('campus-selector');
+    campusSelectEl = document.getElementById('campus-selector');
+    countdownEl = document.getElementById('countdown');
     const savedCampus = localStorage.getItem('iium-prayer-campus') || defaultCampus;
     
-    selector.value = savedCampus;
-    fetchPrayerTimes(savedCampus);
+    if (campusSelectEl) {
+      campusSelectEl.value = savedCampus;
+      campusSelectEl.addEventListener('change', (e) => {
+        const campus = e.target.value;
+        localStorage.setItem('iium-prayer-campus', campus);
+        fetchPrayerTimes(campus);
+      });
+    }
 
-    selector.addEventListener('change', (e) => {
-      const campus = e.target.value;
-      localStorage.setItem('iium-prayer-campus', campus);
-      fetchPrayerTimes(campus);
-    });
+    fetchPrayerTimes(savedCampus);
   });
 </script>
 
