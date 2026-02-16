@@ -37,3 +37,8 @@ especially in dynamically generated rows where structure might be less obvious.
 
 **Learning:** Visual status dashboards that update in the background (via `setInterval`) provide no feedback to screen reader users, leaving them unaware of potentially critical changes.
 **Action:** Add `aria-live="polite"` to the timestamp or status summary element. This ensures updates are announced non-intrusively, keeping all users informed of the system state.
+
+## 2025-05-21 - Human-Centric Relative Time
+
+**Learning:** `Intl.RelativeTimeFormat` with `{ numeric: 'auto' }` produces surprisingly natural language strings like "yesterday" and "last month" instead of rigid "1 day ago" or "1 month ago". This small detail significantly elevates the perceived quality of the interface.
+**Action:** Use `{ numeric: 'auto' }` when implementing relative time displays to match natural conversation patterns, while maintaining precise timestamps in `title` attributes for accuracy.
