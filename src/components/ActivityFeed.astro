@@ -178,7 +178,14 @@ const activities = await fetchActivity();
             <div class="meta">
               <span class="user">@{activity.user}</span>
               <span class="dot">•</span>
-              <span class="date">{activity.date}</span>
+              <time
+                datetime={new Date(activity.timestamp).toISOString()}
+                class="date relative-time"
+                data-timestamp={activity.timestamp}
+                title={new Date(activity.timestamp).toLocaleString()}
+              >
+                {activity.date}
+              </time>
             </div>
           </div>
         </li>
@@ -192,6 +199,18 @@ const activities = await fetchActivity();
     View all activity →
   </a>
 </div>
+
+<script>
+  import { formatRelativeTime } from '../utils/time';
+
+  document.querySelectorAll('.relative-time').forEach((el) => {
+    const ts = Number(el.getAttribute('data-timestamp'));
+    if (!isNaN(ts)) {
+      el.textContent = formatRelativeTime(ts);
+      el.title = new Date(ts).toLocaleString();
+    }
+  });
+</script>
 
 <style>
   .activity-feed {
