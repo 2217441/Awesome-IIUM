@@ -27,3 +27,8 @@ using an escape helper or use `textContent` / DOM creation methods instead of
 **Vulnerability:** Lack of security headers (CSP, Referrer-Policy) on GitHub Pages deployment.
 **Learning:** For static hosting platforms like GitHub Pages where HTTP headers are not customizable, critical security headers can be enforced via `<meta>` tags injected at build time (e.g., in Astro config).
 **Prevention:** Configure `astro.config.mjs` to inject `Content-Security-Policy` and `Referrer-Policy` meta tags in the `<head>`.
+
+## 2026-02-13 - Conflicting Security Policies (CSP Mismatch)
+**Vulnerability:** `astro.config.mjs` injected multiple duplicate/conflicting CSP meta tags, and `public/_headers` (used by GitHub Pages) enforced a different, less permissive policy missing critical directives for search (`blob:`, `worker-src`).
+**Learning:** Having security policies defined in multiple places (meta tags vs. headers) without synchronization leads to confusion and potential production breakages (e.g., search failing on live site but working locally).
+**Prevention:** Harmonize security headers across all configuration files. Maintain a "single source of truth" or manually ensure `public/_headers` matches the most comprehensive policy defined in `astro.config.mjs`.
