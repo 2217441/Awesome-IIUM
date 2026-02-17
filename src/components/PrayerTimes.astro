@@ -252,6 +252,19 @@ try {
     if (nextPrayer && nextPrayer.key !== currentNextPrayerKey) {
       document.getElementById('next-prayer-name').textContent = nextPrayer.name;
 
+      // Update tooltip with absolute time
+      if (nextTime) {
+        const h = nextTime.hours;
+        const m = nextTime.minutes;
+        const ampm = h >= 12 ? 'PM' : 'AM';
+        const h12 = h % 12 || 12;
+        const timeStr = `${h12}:${m.toString().padStart(2, '0')} ${ampm}`;
+        const countdownEl = document.getElementById('countdown');
+        if (countdownEl) {
+          countdownEl.title = `Next prayer at ${timeStr}`;
+        }
+      }
+
       // Highlight current prayer using cached elements
       Object.values(prayerCardElements).forEach(card => card.classList.remove('next'));
       if (prayerCardElements[nextPrayer.key]) {
