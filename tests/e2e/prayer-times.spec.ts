@@ -135,6 +135,20 @@ test.describe('Prayer Times', () => {
 		expect(countdown).toMatch(/\d{2}:\d{2}:\d{2}|--:--:--/);
 	});
 
+	test('should show accessible title on countdown', async ({ page }) => {
+		const hasData = await waitForPrayerData(page);
+		if (!hasData) {
+			test.skip(true, 'Prayer times unavailable');
+			return;
+		}
+
+		// Title should contain readable time format (e.g. 5:30 AM or 17:30)
+		await expect(page.locator('#countdown')).toHaveAttribute(
+			'title',
+			/Next prayer at \d{1,2}:\d{2}(?:\s?[AP]M)?/,
+		);
+	});
+
 	test('should highlight current/next prayer', async ({ page }) => {
 		const hasData = await waitForPrayerData(page);
 		if (!hasData) {

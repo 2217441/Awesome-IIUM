@@ -252,6 +252,13 @@ try {
     if (nextPrayer && nextPrayer.key !== currentNextPrayerKey) {
       document.getElementById('next-prayer-name').textContent = nextPrayer.name;
 
+      // UX Improvement: Add title attribute to countdown for accessibility and hover
+      const countdownEl = document.getElementById('countdown');
+      if (countdownEl && cachedTargetTime) {
+        const timeStr = cachedTargetTime.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+        countdownEl.title = `Next prayer at ${timeStr}`;
+      }
+
       // Highlight current prayer using cached elements
       Object.values(prayerCardElements).forEach(card => card.classList.remove('next'));
       if (prayerCardElements[nextPrayer.key]) {
