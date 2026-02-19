@@ -37,3 +37,7 @@ especially in dynamically generated rows where structure might be less obvious.
 
 **Learning:** Visual status dashboards that update in the background (via `setInterval`) provide no feedback to screen reader users, leaving them unaware of potentially critical changes.
 **Action:** Add `aria-live="polite"` to the timestamp or status summary element. This ensures updates are announced non-intrusively, keeping all users informed of the system state.
+
+## 2026-02-20 - Touch Target Alignment in Grids
+**Learning:** Increasing touch targets (e.g., to 44px) in tight grid layouts often breaks alignment if the parent `grid-template-columns` isn't updated to match.
+**Action:** When upsizing interactive elements for accessibility, always audit and update the containing grid or flex layout dimensions to prevent layout shifts or clipping.
