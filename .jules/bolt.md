@@ -25,3 +25,7 @@
 ## 2026-02-07 - [Hybrid Fetching for Daily Data]
 **Learning:** For data that changes daily (like prayer times), purely static build is insufficient if the user visits on a different day than the build.
 **Action:** Fetch data at build time for the *build date*, pass it to client, and let client logic decide whether to use it (if date matches) or fetch fresh data.
+
+## 2026-02-12 - [E2E Testing Workflow]
+**Learning:** Playwright tests in this project run against the production build (`dist/`), not the dev server or source files directly.
+**Action:** Always run `pnpm build` before executing `pnpm test:e2e` to ensure tests run against the latest changes.

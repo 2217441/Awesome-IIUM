@@ -99,6 +99,8 @@ try {
   let prayerCardElements = {};
   let currentNextPrayerKey = null;
   let cachedTargetTime = null;
+  let cachedCountdownEl = null;
+  let cachedCampusSelectEl = null;
 
   async function fetchPrayerTimes(campusKey) {
     const campus = campuses[campusKey];
@@ -245,7 +247,7 @@ try {
       if (nextTime.tomorrow) {
         target.setDate(target.getDate() + 1);
       }
-      cachedTargetTime = target;
+      cachedTargetTime = target.getTime();
     }
 
     // Only update DOM if prayer changed
@@ -264,46 +266,58 @@ try {
     return { nextPrayer, nextTime };
   }
 
+  function tick() {
+    // Bolt Optimization: Save CPU/battery when tab is hidden
+    if (document.hidden) return;
+
+    // Use cached target time to avoid recalculation and Date object creation
+    if (!cachedTargetTime) {
+      updateNextPrayer();
+      if (!cachedTargetTime) return;
+    }
+
+    // Bolt Optimization: Use Date.now() to avoid object allocation
+    const now = Date.now();
+    const diff = cachedTargetTime - now;
+
+    if (diff < 0) {
+      // Refresh times when countdown ends
+      if (cachedCampusSelectEl) {
+        fetchPrayerTimes(cachedCampusSelectEl.value);
+      } else {
+        fetchPrayerTimes(defaultCampus);
+      }
+      return;
+    }
+
+    const hours = Math.floor(diff / 3600000);
+    const minutes = Math.floor((diff % 3600000) / 60000);
+    const seconds = Math.floor((diff % 60000) / 1000);
+
+    if (cachedCountdownEl) {
+      cachedCountdownEl.textContent =
+        `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+    }
+  }
+
   function startCountdown() {
     if (countdownInterval) clearInterval(countdownInterval);
-    
+
     // Initial update to set cachedTargetTime
     updateNextPrayer();
 
-    // Cache DOM elements to prevent querying every second
-    const countdownEl = document.getElementById('countdown');
-    const campusSelectEl = document.getElementById('campus-selector');
+    // Cache DOM elements once
+    if (!cachedCountdownEl) cachedCountdownEl = document.getElementById('countdown');
+    if (!cachedCampusSelectEl) cachedCampusSelectEl = document.getElementById('campus-selector');
 
-    countdownInterval = setInterval(() => {
-      // Use cached target time to avoid recalculation and Date object creation
-      if (!cachedTargetTime) {
-        updateNextPrayer();
-        if (!cachedTargetTime) return;
-      }
-
-      const now = new Date();
-      const diff = cachedTargetTime - now;
-
-      if (diff < 0) {
-        // Refresh times when countdown ends
-        if (campusSelectEl) {
-          fetchPrayerTimes(campusSelectEl.value);
-        } else {
-          fetchPrayerTimes(defaultCampus);
-        }
-        return;
-      }
-
-      const hours = Math.floor(diff / 3600000);
-      const minutes = Math.floor((diff % 3600000) / 60000);
-      const seconds = Math.floor((diff % 60000) / 1000);
-
-      if (countdownEl) {
-        countdownEl.textContent =
-          `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-      }
-    }, 1000);
+    tick(); // Initial update
+    countdownInterval = setInterval(tick, 1000);
   }
+
+  // Bolt Optimization: Update immediately when tab becomes visible
+  document.addEventListener('visibilitychange', () => {
+    if (!document.hidden) tick();
+  });
 
   // Initialize
   document.addEventListener('DOMContentLoaded', () => {
