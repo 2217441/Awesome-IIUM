@@ -37,3 +37,7 @@ especially in dynamically generated rows where structure might be less obvious.
 
 **Learning:** Visual status dashboards that update in the background (via `setInterval`) provide no feedback to screen reader users, leaving them unaware of potentially critical changes.
 **Action:** Add `aria-live="polite"` to the timestamp or status summary element. This ensures updates are announced non-intrusively, keeping all users informed of the system state.
+
+## 2026-02-27 - Minimum Touch Targets in Grids
+**Learning:** Icon-only buttons (like "Remove Row") in dense grid layouts often fail accessibility guidelines for touch targets (44x44px) because they are constrained by narrow grid columns (e.g., 36px). This makes them frustratingly hard to tap on mobile devices.
+**Action:** When designing grid-based forms, allocate sufficient column width (min 48px) for action buttons and use CSS `min-width`/`min-height` on the button element itself to ensure a large, accessible hit area without breaking the visual alignment.
