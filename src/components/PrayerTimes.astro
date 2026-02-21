@@ -245,7 +245,7 @@ try {
       if (nextTime.tomorrow) {
         target.setDate(target.getDate() + 1);
       }
-      cachedTargetTime = target;
+      cachedTargetTime = target.getTime();
     }
 
     // Only update DOM if prayer changed
@@ -281,7 +281,7 @@ try {
         if (!cachedTargetTime) return;
       }
 
-      const now = new Date();
+      const now = Date.now();
       const diff = cachedTargetTime - now;
 
       if (diff < 0) {
@@ -317,6 +317,15 @@ try {
       const campus = e.target.value;
       localStorage.setItem('iium-prayer-campus', campus);
       fetchPrayerTimes(campus);
+    });
+
+    // Save battery/CPU by stopping timer when tab is hidden
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) {
+        if (countdownInterval) clearInterval(countdownInterval);
+      } else {
+        startCountdown();
+      }
     });
   });
 </script>

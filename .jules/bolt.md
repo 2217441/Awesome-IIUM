@@ -25,3 +25,7 @@
 ## 2026-02-07 - [Hybrid Fetching for Daily Data]
 **Learning:** For data that changes daily (like prayer times), purely static build is insufficient if the user visits on a different day than the build.
 **Action:** Fetch data at build time for the *build date*, pass it to client, and let client logic decide whether to use it (if date matches) or fetch fresh data.
+
+## 2026-02-12 - [Performance of Intervals in Background]
+**Learning:** `setInterval` for UI updates (like countdowns) continues running even when the tab is hidden, wasting CPU/battery.
+**Action:** Use `visibilitychange` API to pause/resume intervals, and prefer `Date.now()` (number) over `new Date()` (object) inside hot loops.
